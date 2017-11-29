@@ -1,0 +1,12 @@
+[run]
+branch = True
+source =
+    app
+    
+[report]
+skip_covered = True
+precision = 2
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    def fake
