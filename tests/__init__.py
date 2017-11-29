@@ -66,7 +66,8 @@ class BasicTest(unittest.TestCase):
         
     def test_collector(self):
         device_1 = Device()
-        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),constants.ACTIVE,0x1,bytes('lola','ascii'),13213)
+        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),
+                             constants.ACTIVE,0x1,bytes('lola','ascii'),13213)
         checksum = bxor(string)
         string += checksum
         response = device_1.send_message(string)
@@ -76,7 +77,8 @@ class BasicTest(unittest.TestCase):
         assert message_number == 1
         assert checksum == bxor(struct.pack('=BH',header,message_number))
 
-        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),constants.ACTIVE,0x2,bytes('lola','ascii'),13213,bytes('lola2','ascii'),123)
+        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),
+                             constants.ACTIVE,0x2,bytes('lola','ascii'),13213,bytes('lola2','ascii'),123)
         checksum = bxor(string)
         string += checksum
         response = device_1.send_message(string)
@@ -90,7 +92,8 @@ class BasicTest(unittest.TestCase):
         #response = device_1.send_message(string)
         #(header,message_number,checksum) = struct.unpack('=BHc',response)
         
-        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),constants.ACTIVE,0x1,bytes('lola','ascii'),13213)
+        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),
+                             constants.ACTIVE,0x1,bytes('lola','ascii'),13213)
         checksum = b'1'
         string += checksum
         response = device_1.send_message(string)
@@ -101,7 +104,8 @@ class BasicTest(unittest.TestCase):
         assert checksum == bxor(struct.pack('=BH',header,message_number))
         
         device_2 = Device()
-        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_2.message_number,bytes('device_2','ascii'),constants.ACTIVE,0x1,bytes('lola','ascii'),13213)
+        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_2.message_number,bytes('device_2','ascii'),
+                             constants.ACTIVE,0x1,bytes('lola','ascii'),13213)
         checksum = bxor(string)
         string += checksum
         response = device_2.send_message(string)
@@ -119,12 +123,14 @@ class BasicTest(unittest.TestCase):
         device_1 = Device()
         device_2 = Device()
 
-        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),constants.ACTIVE,0x1,bytes('lola','ascii'),0)
+        string = struct.pack('=BH8sBB8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),
+                             constants.ACTIVE,0x1,bytes('lola','ascii'),0)
         checksum = bxor(string)
         string += checksum
         device_1.send_message(string)
         
-        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),constants.ACTIVE,0x2,bytes('lola','ascii'),1,bytes('lola2','ascii'),2)
+        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_1.message_number,bytes('device_1','ascii'),
+                             constants.ACTIVE,0x2,bytes('lola','ascii'),1,bytes('lola2','ascii'),2)
         checksum = bxor(string)
         string += checksum
         device_1.send_message(string)
@@ -132,7 +138,8 @@ class BasicTest(unittest.TestCase):
         observer_1 = Observer()
         assert len(observer_1.devices) == 1
 
-        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_2.message_number,bytes('device_2','ascii'),constants.ACTIVE,0x2,bytes('a','ascii'),1,bytes('b','ascii'),2)
+        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_2.message_number,bytes('device_2','ascii'),
+                             constants.ACTIVE,0x2,bytes('a','ascii'),1,bytes('b','ascii'),2)
         checksum = bxor(string)
         string += checksum
         device_2.send_message(string)
@@ -140,7 +147,8 @@ class BasicTest(unittest.TestCase):
         observer_2 = Observer()
         assert len(observer_2.devices) == 2
 
-        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_2.message_number,bytes('device_2','ascii'),constants.ACTIVE,0x2,bytes('a','ascii'),0,bytes('b','ascii'),1)
+        string = struct.pack('=BH8sBB8sL8sL',constants.FIRST_BYTE,device_2.message_number,bytes('device_2','ascii'),
+                             constants.ACTIVE,0x2,bytes('a','ascii'),0,bytes('b','ascii'),1)
         checksum = bxor(string)
         string += checksum
         device_2.send_message(string)

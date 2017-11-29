@@ -29,7 +29,10 @@ class Consul(TCPServer):
     def list_connections(self):
         res = ''
         for a,device in storage['devices'].items():
-            res += '%s|%s|%s|%s\r\n'%(device['d_id'],device['m_id'],device['state'],int((time.time()-device['last_message'])*1000))
+            res += '%s|%s|%s|%s\r\n'%(device['d_id'],
+                                      device['m_id'],
+                                      device['state'],
+                                      int((time.time()-device['last_message'])*1000))
         return bytes(res,'ascii')
 
     @gen.coroutine
