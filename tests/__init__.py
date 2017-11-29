@@ -152,6 +152,9 @@ class BasicTest(unittest.TestCase):
         assert len(response_2) == 2
 
         assert response_1[-1] == response_2[-1]
+
+        observer_1.disconnect()
+        observer_2.disconnect()
         
         
     def tearDown(self):

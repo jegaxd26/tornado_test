@@ -19,8 +19,7 @@ class Consul(TCPServer):
             storage['observers'][address] = stream
         while True:
             try:
-                data = yield stream.read_bytes(21)
-                yield stream.write(b'')
+                yield stream.read_bytes(21)
             except StreamClosedError:
                 if address in storage['observers']:
                     del storage['observers'][address]
