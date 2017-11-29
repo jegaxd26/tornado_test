@@ -3,9 +3,11 @@ import click
 import os
 
 from coverage import Coverage
-if os.getenv('COVERAGE'):
-    coverInstance = Coverage()
-    coverInstance.start()
+#if os.getenv('COVERAGE'):
+#    coverInstance = Coverage()
+#    coverInstance.start()
+coverInstance = Coverage()
+coverInstance.start()
 
 import app
 

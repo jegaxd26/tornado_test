@@ -7,6 +7,7 @@ import app.constants as constants
 from app.utils import bxor
 from app import storage
 from collections import defaultdict
+import time
 
 class Collector(TCPServer):
     def __init__(self,*args,message_callback=None,**kwargs):
@@ -19,40 +20,61 @@ class Collector(TCPServer):
         while True:
             try:
                 fail = False
-                data = yield stream.read_bytes(21)
-                (header,m_id,d_id,state,numfields,name) = struct.unpack(constants.PACKET_BEGINING,data)
-                add_data = b''
-                checksum = b''
-                value = b''
-                if numfields == 1:
-                    add_data = yield stream.read_bytes(1)
-                    (checksum) = struct.unpack(constants.PACKET_END_WITHOUT_VALUE,add_data)
-                elif numfields == 2:
-                    add_data = yield stream.read_bytes(5)
-                    (value,checksum) = struct.unpack(constants.PACKET_END_WITH_VALUE,add_data)
-                else: fail = True
-                data += add_data
+                data = yield stream.read_bytes(13)
+                numfields=0
+                try:
+                    (header,m_id,d_id,state,numfields) = struct.unpack(constants.PACKET_BEGINING,data)
+                except Exception:
+                    fail = True
+
+                state_repr = ''
+                if state == constants.ACTIVE:
+                    state_repr='ACTIVE'
+                elif state == constants.IDLE:
+                    state_repr='IDLE'
+                elif state == constants.RECHARGING:
+                    state_repr='RECHARGING'
+                else:
+                    fail = True
+
+                values = yield stream.read_bytes(numfields*(12))
+                checksum = yield stream.read_bytes(1)
+
+                data += values+checksum
+                
+                (checksum,) = struct.unpack(constants.PACKET_END,checksum)
+
                 new_checksum = bxor(data[:-1])
                 
                 if checksum != new_checksum:
                     fail = True
                     
+                if values:
+                    values = {values[i:i+8]:values[i+8:i+12] for i in range(0,len(values),12)}
+
                 response = struct.pack(constants.RESPONSE_FORMAT,
                                        constants.RESPONSE_FAIL if fail else constants.RESPONSE_SUCCESS,
                                        0 if fail else m_id)
-                
                 checksum = bxor(response)
                 response += checksum
-                                       
                 yield stream.write(response)
 
-                storage['devices'][address] = dict(d_id=d_id,m_id=m_id,state=state)
+                storage['devices'][address] = dict(d_id=d_id.decode('ascii'),
+                                                   m_id=m_id,
+                                                   state=state_repr,
+                                                   last_message=time.time())
                     
-
                 if self.message_callback:
-                    message = d_id+b'|'+name+b'|'+ value +b'\r\n'
-                    yield self.message_callback(message)
+                    message = ''
+                    for field,value in values.items():
+                        message += '%s|%s|%s\r\n'%(d_id.decode('ascii').rstrip('\0'),
+                                                   field.decode('ascii').rstrip('\0'),
+                                                   int.from_bytes(value,'little'))
+                        
+                    yield self.message_callback(bytes(message,'ascii'))
                 
             except StreamClosedError:
+                if address in storage['devices']:
+                    del storage['devices'][address]
                 break
 
