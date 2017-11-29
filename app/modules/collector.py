@@ -1,7 +1,6 @@
 from tornado.tcpserver import TCPServer
 from tornado.iostream import StreamClosedError
 from tornado import gen
-from tornado.testing  import gen_test
 import struct
 import app.constants as constants
 from app.utils import bxor

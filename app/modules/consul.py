@@ -3,7 +3,6 @@ from tornado.iostream import StreamClosedError
 from tornado import gen
 import struct
 import app.constants as constants
-from app.utils import bxor
 from app import storage
 import time
 
@@ -19,6 +18,7 @@ class Consul(TCPServer):
             storage['observers'][address] = stream
         while True:
             try:
+                # also best effort, since we have no delimiter.
                 yield stream.read_bytes(21)
             except StreamClosedError:
                 if address in storage['observers']:
